@@ -1,8 +1,11 @@
 package com.project.emp.controller;
 
 
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -10,13 +13,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-
 import com.project.emp.entity.Employee;
 import com.project.emp.service.EmployeeService;
 
-@RestController
-@RequestMapping("/student")
+@Controller
 public class EmployeeController {
 	
 	private EmployeeService employeeService;
@@ -26,9 +26,17 @@ public class EmployeeController {
 		this.employeeService = employeeService;
 	}
 	
-	@PostMapping
-	public String createEmployee(@RequestBody Employee employee) {
-		return employeeService.createEmployee(employee);
+	@GetMapping("/employees/new")
+	public String createEmployeeForm(Model model) {
+		//Create Employee Object to hold employee form data
+		Employee employee = new Employee();
+		model.addAttribute("employee" , employee);
+		return "create_employee";
+	}
+	@PostMapping("/employees")
+	public String saveEmployee(@ModelAttribute("employee") Employee employee) {
+		employeeService.saveEmployee(employee);
+		return "redirect:/employees";
 	}
 	
 	@GetMapping("{id}")
@@ -36,10 +44,11 @@ public class EmployeeController {
 		return employeeService.getEmployee(id);
 	}
 	
-	@GetMapping("/students")
-	public List<Employee> getAllEmployees(){
-		return employeeService.getAllEmployees();
-	}
+	@GetMapping("/employees")
+	public String getAllEmployees(Model model){
+		model.addAttribute("employees" ,employeeService.getAllEmployees());
+		return "employees";
+	} 	
 	
 	@PutMapping
 	public String updateEmployee(@RequestBody Employee employee) {

@@ -6,7 +6,7 @@ import com.project.emp.entity.Employee;
 
 public interface EmployeeService {
 	
-	String createEmployee(Employee employee);
+	Employee saveEmployee(Employee employee);
 	
 	Employee getEmployee(Long id);
 	
