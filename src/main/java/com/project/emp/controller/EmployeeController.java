@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-
+import com.fasterxml.jackson.annotation.JsonCreator.Mode;
 import com.project.emp.entity.Employee;
 import com.project.emp.service.EmployeeService;
 
@@ -49,14 +49,31 @@ public class EmployeeController {
 		return "employees";
 	} 	
 	
-	@PutMapping
-	public String updateEmployee(@RequestBody Employee employee) {
-		return employeeService.updateEmployee(employee);
+	
+	@GetMapping("/employees/edit/{id}")
+	public String editEmployeeForm(@PathVariable Long id , Model model) {
+		model.addAttribute("employee",employeeService.getEmployee(id));
+		return "edit_employee";
 	}
 	
-	@DeleteMapping("{id}")
-	public String deleteEmployee(@PathVariable Long id) {
-		return employeeService.deleteEmployee(id);
+	@PostMapping("/employees/{id}")
+	public String updateEmployee(@PathVariable Long id , 
+			                     @ModelAttribute("employee") Employee employee,
+			                     Model model) {
+		Employee existingEmployee = employeeService.getEmployee(id);
+		existingEmployee.setId(id);
+		existingEmployee.setFirstName(employee.getFirstName());
+		existingEmployee.setLastName(employee.getLastName());
+		existingEmployee.setEmail(employee.getEmail());
+		employeeService.saveEmployee(existingEmployee);
+		return "redirect:/employees";
 	}
+	
+	@GetMapping("/employees/remove/{id}")
+	public String deleteEmployee(@PathVariable Long id) {
+		employeeService.deleteEmployee(id);
+		return "redirect:/employees";
+	}
+	
 	
 }
